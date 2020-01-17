@@ -1,0 +1,8 @@
+<div class="p-3 overflow-auto flex-grow-1 h-100" (click)="onClick($event)">
+  <div class="px-3 pb-3">
+    <app-fund-list #favoriteFunds data-cy="favorite-funds-grid" pageTitle="Favorite Funds" mode="favorite" class="d-block" (click)="favoriteFundsOnClick($event)"></app-fund-list>
+  </div>
+  <div class="shadow-sm bg-white rounded px-3 pb-3 mb-3">
+	<app-fund-list #allFunds data-cy="all-funds-grid" pageTitle="All Funds" mode="all" class="d-block mt-4" (click)="allFundsOnClick($event)"></app-fund-list>
+  </div>
+</div>

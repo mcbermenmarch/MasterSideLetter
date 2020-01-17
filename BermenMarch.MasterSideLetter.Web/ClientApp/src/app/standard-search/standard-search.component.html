@@ -1,0 +1,276 @@
+<div class="d-flex flex-column flex-grow-1 w-100 h-100">
+  <div class="p-3 d-flex">
+    <div class="d-flex flex-column">
+      <h5 class="text-nowrap">Standard Search</h5>
+      <p-radioButton name="standardSearchOptionButton" value="standard" label="Standard" [(ngModel)]="searchOption" [routerLink]="['/standard-search']"></p-radioButton>
+      <p-radioButton name="standardSearchOptionButton" value="precedent" label="Precedent" [(ngModel)]="searchOption" [routerLink]="['/precedent-search'] "></p-radioButton>
+    </div>
+
+    <div class="flex-grow-1 mx-3">
+      <div>
+        <input id="searchInput" #standardSearchInput type="text" pInputText class="w-100" (keyup.enter)="getSearchResults()" style="min-width: 0 !important;" placeholder="Search" [(ngModel)]="criteria.targetText">
+      </div>
+      <div class="p-1">
+        <p-selectButton [options]="searchCategories" [(ngModel)]="criteria.searchCategory" class="search-category p-1" (onChange)="getSearchResults()"></p-selectButton>
+      </div>
+
+      <div class="d-flex flex-wrap">
+        <div class="search-multi-filter p-1">
+          <p>Fund</p>
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.fundValues"
+                          [suggestions]="fundList"
+                          [multiple]="true"
+                          placeholder="Fund"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'Fund')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Investor Name</p>
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.investorValues"
+                          [suggestions]="investorList"
+                          [multiple]="true"
+                          placeholder="investor"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'Investor')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Sponsor</p>
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.sponsorValues"
+                          [suggestions]="sponsorList"
+                          [multiple]="true"
+                          placeholder="Sponsor"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'Sponsor')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Business Unit</p>
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.businessUnitValues"
+                          [suggestions]="businessUnitList"
+                          [multiple]="true"
+                          placeholder="Business Unit"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'BusinessUnit')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Strategy</p>
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.strategyValues"
+                          [suggestions]="strategyList"
+                          [multiple]="true"
+                          placeholder="Strategy"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'Strategy')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Investor Type</p>
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.investorTypeValues"
+                          [suggestions]="investorTypeList"
+                          [multiple]="true"
+                          placeholder="Investor Type"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'InvestorType')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Investor Entity</p>
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.entityValues"
+                          [suggestions]="entityList"
+                          [multiple]="true"
+                          placeholder="Investor Entity"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'Entity')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Investor Counsel</p>
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.counselValues"
+                          [suggestions]="counselList"
+                          [multiple]="true"
+                          placeholder="Counsel"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'Counsel')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Provision Type</p>
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.provisionTypeValues"
+                          [suggestions]="provisionTypeList"
+                          [multiple]="true"
+                          placeholder="Provision Type"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'ProvisionType')"></p-autoComplete>
+        </div>
+        <div class="search-range-filter p-1">
+          <p>Year</p>
+          <span class="ui-inputgroup ">
+            <span class="ui-inputgroup-addon">min</span>
+            <input type="text" [(ngModel)]="criteria.yearMin" pInputText placeholder="value">
+            <span class="ui-inputgroup-addon">max</span>
+            <input type="text" [(ngModel)]="criteria.yearMax" pInputText placeholder="value">
+          </span>
+        </div>
+        <div class="search-range-filter p-1">
+          <p>Fund Size</p>
+          <span class="ui-inputgroup ">
+            <span class="ui-inputgroup-addon">min</span>
+            <input type="text" [(ngModel)]="criteria.sizeMin" pInputText placeholder="value">
+            <span class="ui-inputgroup-addon">max</span>
+            <input type="text" [(ngModel)]="criteria.sizeMax" pInputText placeholder="value">
+          </span>
+        </div>
+        <div class="search-range-filter p-1">
+          <p>Aggregate Investor Size</p>
+          <span class="ui-inputgroup ">
+            <span class="ui-inputgroup-addon">min</span>
+            <input type="text" [(ngModel)]="criteria.aggregateSizeMin" pInputText placeholder="value">
+            <span class="ui-inputgroup-addon">max</span>
+            <input type="text" [(ngModel)]="criteria.aggregateSizeMax" pInputText placeholder="value">
+          </span>
+        </div>
+        <div class="search-range-filter p-1">
+          <p>Investor Commitment</p>
+          <span class="ui-inputgroup ">
+            <span class="ui-inputgroup-addon">min</span>
+            <input type="text" [(ngModel)]="criteria.commitmentMin" pInputText placeholder="value">
+            <span class="ui-inputgroup-addon">max</span>
+            <input type="text" [(ngModel)]="criteria.commitmentMax" pInputText placeholder="value">
+          </span>
+        </div>
+      </div>
+      <div class="d-flex justify-content-end">
+        <div class="d-flex flex-column justify-content-center">
+          <button pButton (click)="getSearchResults()" label="Search"></button>
+          <a [routerLink]="" (click)="reset()" tabindex="-1"><small>Clear All Fields</small></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--results panel-->
+  <div *ngIf="searchResults" class="border-top">
+
+    <!--funds-->
+    <div *ngIf="displayResults('Fund')" class="px-3 pb-3">
+      <div class="py-2">
+        <div class="h5 text-highlight">Funds</div>
+      </div>
+      <app-fund-list [rows]="searchResults.fundRows" data-cy="search-result-funds-" pageTitle="Fund" mode="search" class="d-block mb-4"></app-fund-list>
+      <div *ngIf="showViewMoreFunds" class="text-center">
+        <a [routerLink]="" (click)="getMoreResults('Fund')">View More</a>
+      </div>
+    </div>
+
+    <!--investors-->
+    <div *ngIf="displayResults('Investor')" class="px-3 pb-3">
+      <div class="py-2">
+        <div class="h5 text-highlight">Investors</div>
+      </div>
+
+      <app-investor-list [rows]="searchResults.investorRows" data-cy="search-result-investors-" pageTitle="Investor" mode="search" class="d-block mb-4"></app-investor-list>
+      <div *ngIf="showViewMoreInvestors" class="text-center">
+        <a [routerLink]="" (click)="getMoreResults('Investor')">View More</a>
+      </div>
+    </div>
+
+
+    <!--sideletters/fund investor-->
+    <div *ngIf="displayResults('SideLetter')" class="px-3 pb-3">
+      <div class="py-2">
+        <div class="h5 text-highlight">Side Letters</div>
+      </div>
+      <p-table [value]="searchResults.sideLetterRows"
+               [columns]="sideLetterCols"
+               [scrollable]="true"
+               [resizableColumns]="true"
+               columnResizeMode="expand">
+        <ng-template pTemplate="colgroup" let-columns>
+          <colgroup>
+            <col *ngFor="let col of columns" [style.width]="col.width" />
+            <col style="width: 14rem">
+          </colgroup>
+        </ng-template>
+        <ng-template pTemplate="header" let-columns>
+          <tr data-cy="favorites-fund-header">
+            <th *ngFor="let col of columns" class="crop" pResizableColumn>{{col.header}}</th>
+            <th pResizableColumn>Side Letter</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex" let-columns="columns">
+          <tr data-cy="favorites-fund-rows">
+            <td *ngFor="let col of columns" class="crop highlight-text" data-cy="row-cell" [ngSwitch]="col.field">
+              <div *ngSwitchCase="'investorName'"><a  *ngIf="rowData.investorId" [routerLink]="['/investors',rowData.investorId]" class="text-cell" tabindex="-1">{{rowData.investorName}}</a></div>
+              <div *ngSwitchCase="'fundName'"><a  *ngIf="rowData.fundId" [routerLink]="['/funds',rowData.fundId]" class="text-cell" tabindex="-1">{{rowData.fundName}}</a></div>
+              <div *ngSwitchCase="'commitment'" class="text-align-right">{{rowData.commitment | currency:'$':'symbol':'1.0-0' }}</div>
+              <span *ngSwitchDefault>{{rowData[col.field]}}</span>
+            </td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="flex-grow-1 crop"><a tabindex="-1" href="/api/fundInvestor/downloadSideLetter/{{ rowData.id }}" [attr.title]="rowData.sideLetterFileName">{{rowData.sideLetterFileName }}</a></div>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <div *ngIf="showViewMoreSideLetters" class="text-center">
+        <a [routerLink]="" (click)="getMoreResults('SideLetter')">View More</a>
+      </div>
+    </div>
+
+
+    <!--provisions-->
+    <div *ngIf="displayResults('Provision')" class="px-3 pb-3">
+      <div class="py-2">
+        <div class="h5 text-highlight">Provisions</div>
+      </div>
+      <div class="flex-grow-1 overflow-auto p-3">
+        <div class="shadow-sm bg-white mb-3 p-3 d-flex" *ngFor="let provision of searchResults.provisionRows">
+          <div class="flex-grow-1 pr-0 mr-1 border-right">
+            <p class="highlight-text" [innerHTML]="provision.content"></p>
+          </div>
+
+          <div class="flex-shrink-0 d-flex flex-column" style="width: 16rem;">
+            <a tabindex="-1" href="/api/fundInvestor/downloadSideLetter/{{ provision.fundInvestorId }}" [attr.title]="provision.sideLetterFileName" class="crop highlight-text">{{provision.sideLetterFileName }}</a>
+            <div class="d-flex align-items-center">
+              <div class="text-highlight font-weight-bold text-nowrap flex-shrink-0">Provision Type: </div>
+              <div class="flex-grow-1">
+                <p-autoComplete styleClass="my-inplace w-100" inputStyleClass="w-100 lh-1" class="highlight-text"
+                                appendTo="body"
+                                [(ngModel)]="provision.provisionType"
+                                [suggestions]="availableProvisionTypes"
+                                (completeMethod)="provisionTypeSearch($event)"
+                                (onKeyUp)="provisionTypeOnKeyUp($event, provision)"
+                                (onBlur)="provisionTypeOnBlur($event,provision)"></p-autoComplete>
+              </div>
+            </div>
+            <div class="crop"><span class="text-highlight font-weight-bold">Fund: </span><span class="highlight-text"><a *ngIf="provision.fundId"  tabindex="-1"  [routerLink]="['/funds',provision.fundId]">{{ provision.fundName }}</a></span></div>
+            <div class="crop"><span class="text-highlight font-weight-bold">Investor: </span><span class="highlight-text"><a *ngIf="provision.investorId"  tabindex="-1" [routerLink]="['/investors',provision.investorId]">{{ provision.investorName }}</a></span></div>
+            <div class="crop"><span class="text-highlight font-weight-bold">Sponsor: </span><span class="highlight-text">{{ provision.fundSponsorName }}</span></div>
+            <div class="crop"><span class="text-highlight font-weight-bold">Commitment: </span><span class="highlight-text">{{ provision.commitment }}</span></div>
+            <div class="crop"><span class="text-highlight font-weight-bold">Investor Type: </span><span class="highlight-text">{{ provision.investorType }}</span></div>
+            <div class="crop"><span class="text-highlight font-weight-bold">Fund Year: </span><span class="highlight-text">{{ provision.fundYear }}</span></div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="showViewMoreProvisions" class="text-center">
+        <a [routerLink]="" (click)="getMoreResults('Provision')">View More</a>
+      </div>
+    </div>
+
+  </div>
+  <div *ngIf="displayNoResults()">No results found.</div>
+</div>
+
+
+
+
+
+
+
+
+
+

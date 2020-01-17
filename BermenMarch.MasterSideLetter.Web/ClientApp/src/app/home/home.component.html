@@ -1,0 +1,14 @@
+<div class="p-3 overflow-auto flex-grow-1 h-100" (click)="onClick($event)">
+  <h5>Funds</h5>
+  <div class="shadow-sm bg-white rounded px-3 pb-3 mb-3">
+    <app-fund-list #favoriteFunds data-cy="favorite-funds" pageTitle="Favorites" mode="favorite" class="d-block mb-4"  (click)="favoriteFundsOnClick($event)"></app-fund-list>
+    <app-fund-list #recentFunds data-cy="recent-funds" pageTitle="Recently Viewed" mode="recent" class="d-block mt-4"  (click)="recentFundsOnClick($event)"></app-fund-list>
+  </div>
+
+  <h5>Investors</h5>
+  <div class="shadow-sm bg-white rounded px-3 pb-3">
+    <app-investor-list #favoriteInvestors data-cy="favorite-investors" pageTitle="Favorites" mode="favorite" class="d-block mb-4" (click)="favoriteInvestorsOnClick($event)"></app-investor-list>
+    <app-investor-list #recentInvestors data-cy="recent-investors" pageTitle="Recently Viewed" mode="recent" class="d-block mt-4" (click)="recentInvestorsOnClick($event)"></app-investor-list>
+  </div>
+</div>
+

@@ -1,0 +1,210 @@
+<!--BEGIN - PROGRESS BAR OVERLAY-->
+<p-sidebar [(visible)]="progressBarVisible" [fullScreen]="true" [baseZIndex]="10000" styleClass="bg-transparent">
+  <p-progressBar mode="indeterminate" [style]="{'height': '6px'}"></p-progressBar>
+</p-sidebar>
+<!--END - PROGRESS BAR OVERLAY-->
+
+<div class=" stb-nav d-flex flex-row py-1 px-2 align-items-center">
+
+  <div class="mr-3">
+    <a class="stb-nav-link" data-cy="home-component" routerLink="home" routerLinkActive="active">Home</a>
+  </div>
+
+  <div class="mr-3">
+    <a class="stb-nav-link" data-cy="funds-component" routerLink="funds" routerLinkActive="active">Funds</a>
+  </div>
+
+  <div class="mr-auto">
+    <a class="stb-nav-link" data-cy="investors-component" routerLink="investors" routerLinkActive="active">Investors</a>
+  </div>
+
+  <div class="d-md-none mr-3">
+    <a (click)="toggleSearch($event);"><i class="fa fa-search stb-nav-link"></i></a>
+  </div>
+
+
+  <div class="ui-inputgroup lh-1 d-none d-md-flex mr-3">
+    <input type="text" readonly pInputText placeholder="Search" (click)="toggleSearch($event);">
+    <span class="ui-inputgroup-addon"><i class="fa fa-search" (click)="toggleSearch($event);"></i></span>
+  </div>
+
+  <div class="mr-3">
+    <a class="stb-nav-link" data-cy="settings-component" routerLink="settings" routerLinkActive="active" title="Settings"><i class="fa fa-lg fa-cog"></i></a>
+  </div>
+
+</div>
+
+<p-panel showHeader="false" [toggleable]="true" class="search-panel" [(collapsed)]="searchCollapsed" #searchPanel transitionOptions="200ms cubic-bezier(0.86, 0, 0.07, 1)">
+  <a class="fa fa-times link pr-1 text-muted float-right " (click)="toggleSearch($event)" title="Close" tabindex="-1"></a>
+  <div class="p-3 d-flex">
+    <div class="d-flex flex-column">
+      <h5 class="text-capitalize text-nowrap">{{searchOption}} Search</h5>
+      <p-radioButton name="overlaySearchOptionButton" value="standard" label="Standard" [(ngModel)]="searchOption" (click)="setSearchFocus();"></p-radioButton>
+      <p-radioButton name="overlaySearchOptionButton" value="precedent" label="Precedent" [(ngModel)]="searchOption" (click)="setSearchFocus();"></p-radioButton>
+    </div>
+
+    <div class="flex-grow-1 mx-3">
+      <div>
+        <textarea *ngIf="searchOption==='precedent'" class="w-100" pInputTextarea #precedentSearchTextarea placeholder="Search" rows="5" [(ngModel)]="criteria.targetText" (keydown.enter)="precedentSearchOnEnter();"></textarea>
+        <input *ngIf="searchOption==='standard'" id="searchInput" #standardSearchInput type="text" pInputText class="w-100" (keyup.enter)="search(); displaySearch=false;" placeholder="Search" [(ngModel)]="criteria.targetText">
+      </div>
+      <div *ngIf="searchOption==='standard'" class="p-1">
+        <p-selectButton [options]="searchCategories" [(ngModel)]="criteria.searchCategory" class="search-category p-1"></p-selectButton>
+      </div>
+
+      <div class="d-flex flex-wrap">
+        <div class="search-multi-filter p-1">
+          <p>Fund</p>
+
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.fundValues"
+                          [suggestions]="fundList"
+                          [multiple]="true"
+                          placeholder="Fund"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'Fund')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Investor Name</p>
+
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.investorValues"
+                          [suggestions]="investorList"
+                          [multiple]="true"
+                          placeholder="investor"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'Investor')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Sponsor</p>
+
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.sponsorValues"
+                          [suggestions]="sponsorList"
+                          [multiple]="true"
+                          placeholder="Sponsor"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'Sponsor')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Business Unit</p>
+
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.businessUnitValues"
+                          [suggestions]="businessUnitList"
+                          [multiple]="true"
+                          placeholder="Business Unit"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'BusinessUnit')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Strategy</p>
+
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.strategyValues"
+                          [suggestions]="strategyList"
+                          [multiple]="true"
+                          placeholder="Strategy"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'Strategy')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Investor Type</p>
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.investorTypeValues"
+                          [suggestions]="investorTypeList"
+                          [multiple]="true"
+                          placeholder="Investor Type"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'InvestorType')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Investor Entity</p>
+
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.entityValues"
+                          [suggestions]="entityList"
+                          [multiple]="true"
+                          placeholder="Investor Entity"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'Entity')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Investor Counsel</p>
+
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.counselValues"
+                          [suggestions]="counselList"
+                          [multiple]="true"
+                          placeholder="Counsel"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'Counsel')"></p-autoComplete>
+        </div>
+        <div class="search-multi-filter p-1">
+          <p>Provision Type</p>
+
+          <p-autoComplete appendTo="body"
+                          [(ngModel)]="criteria.provisionTypeValues"
+                          [suggestions]="provisionTypeList"
+                          [multiple]="true"
+                          placeholder="Provision Type"
+                          [forceSelection]="true"
+                          (completeMethod)="getFilterContents($event, 'ProvisionType')"></p-autoComplete>
+        </div>
+        <div class="search-range-filter p-1">
+          <p>Year</p>
+
+          <span class="ui-inputgroup ">
+            <span class="ui-inputgroup-addon">min</span>
+            <input type="text" [(ngModel)]="criteria.yearMin" pInputText placeholder="value">
+            <span class="ui-inputgroup-addon">max</span>
+            <input type="text" [(ngModel)]="criteria.yearMax" pInputText placeholder="value">
+          </span>
+        </div>
+        <div class="search-range-filter p-1">
+          <p>Fund Size</p>
+
+          <span class="ui-inputgroup ">
+            <span class="ui-inputgroup-addon">min</span>
+            <input type="text" [(ngModel)]="criteria.sizeMin" pInputText placeholder="value">
+            <span class="ui-inputgroup-addon">max</span>
+            <input type="text" [(ngModel)]="criteria.sizeMax" pInputText placeholder="value">
+          </span>
+        </div>
+        <div class="search-range-filter p-1">
+          <p>Aggregate Investor Size</p>
+
+          <span class="ui-inputgroup ">
+            <span class="ui-inputgroup-addon">min</span>
+            <input type="text" [(ngModel)]="criteria.aggregateSizeMin" pInputText placeholder="value">
+            <span class="ui-inputgroup-addon">max</span>
+            <input type="text" [(ngModel)]="criteria.aggregateSizeMax" pInputText placeholder="value">
+          </span>
+        </div>
+        <div class="search-range-filter p-1">
+          <p>Investor Commitment</p>
+
+          <span class="ui-inputgroup ">
+            <span class="ui-inputgroup-addon">min</span>
+            <input type="text" [(ngModel)]="criteria.commitmentMin" pInputText placeholder="value">
+            <span class="ui-inputgroup-addon">max</span>
+            <input type="text" [(ngModel)]="criteria.commitmentMax" pInputText placeholder="value">
+          </span>
+        </div>
+      </div>
+
+      <div>
+        <div class="d-flex justify-content-end">
+          <div class="d-flex flex-column justify-content-center">
+            <button pButton (click)="search()" label="Search"></button>
+            <a [routerLink]="" (click)="reset()" tabindex="-1"><small>Clear All Fields</small></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-panel>
+
+
+<router-outlet></router-outlet>
+<p-toast position="top-right"></p-toast>

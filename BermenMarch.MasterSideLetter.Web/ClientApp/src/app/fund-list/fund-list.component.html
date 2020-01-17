@@ -1,0 +1,224 @@
+<div class="d-flex flex-row align-items-center" (click)="trySaveEdits()">
+  <div *ngIf="showTitle" class="mr-auto mb-0 h5 text-highlight">{{pageTitle}}</div>
+  <div *ngIf="mode==='all'" class="ui-inputgroup lh-1">
+    <input data-cy="fundpage-search" readonly type="text" pInputText placeholder="Search" (click)="showSearchPanel()">
+    <span class="ui-inputgroup-addon" data-cy="click-seacrh"><i class="fa fa-search" (click)="showSearchPanel()"></i></span>
+  </div>
+  <p-menubar *ngIf="showAddButton" data-cy="add-fund-button" [model]="menuBarItems" [autoDisplay]="false"></p-menubar>
+</div>
+<!--add standard -search-criteria-->
+<div *ngIf="showFundListSearch" class="flex-grow-0 mx-3">
+  <div>
+    <input id="searchInput" tabindex="0" type="text" pInputText class="w-100" (keyup.enter)="getSearchResults()" style="min-width:0 !important;" placeholder="Search" [(ngModel)]="criteria.targetText">
+  </div>
+  <div class="d-flex flex-wrap">
+
+    <div class="search-multi-filter p-1">
+      <p>Fund</p>
+      <p-autoComplete appendTo="body"
+                      [(ngModel)]="criteria.fundValues"
+                      [suggestions]="fundList"
+                      [multiple]="true"
+                      placeholder="Fund"
+                      [forceSelection]="true"
+                      (completeMethod)="getFilterContents($event, 'Fund')"></p-autoComplete>
+    </div>
+
+    <div class="search-multi-filter p-1">
+      <p>Sponsor</p>
+      <p-autoComplete appendTo="body"
+                      [(ngModel)]="criteria.sponsorValues"
+                      [suggestions]="sponsorList"
+                      [multiple]="true"
+                      placeholder="Sponsor"
+                      (completeMethod)="getFilterContents($event, 'Sponsor')"
+                      [forceSelection]="true"
+                      (onKeyUp)="searchSponsorOnKeyUp($event);"></p-autoComplete>
+    </div>
+    <div class="search-multi-filter p-1">
+      <p>Business Unit</p>
+      <p-autoComplete appendTo="body"
+                      [(ngModel)]="criteria.businessUnitValues"
+                      [suggestions]="businessUnitList"
+                      [multiple]="true"
+                      placeholder="Business Unit"
+                      (completeMethod)="getFilterContents($event, 'BusinessUnit')"
+                      [forceSelection]="true"
+                      (onKeyUp)="searchBusinessUnitOnKeyUp($event);"></p-autoComplete>
+    </div>
+    <div class="search-multi-filter p-1">
+      <p>Strategy</p>
+      <p-autoComplete appendTo="body"
+                      [(ngModel)]="criteria.strategyValues"
+                      [suggestions]="strategyList"
+                      [multiple]="true"
+                      placeholder="Strategy"
+                      (completeMethod)="getFilterContents($event, 'Strategy')"
+                      [forceSelection]="true"
+                      (onKeyUp)="searchStrategyOnKeyUp($event);"></p-autoComplete>
+    </div>
+    <div class="search-range-filter p-1">
+      <p>Year</p>
+      <span class="ui-inputgroup ">
+        <span class="ui-inputgroup-addon">min</span>
+        <input type="text" [(ngModel)]="criteria.yearMin" pInputText placeholder="value">
+        <span class="ui-inputgroup-addon">max</span>
+        <input type="text" [(ngModel)]="criteria.yearMax" pInputText placeholder="value">
+      </span>
+    </div>
+    <div class="search-range-filter p-1">
+      <p>Size</p>
+      <span class="ui-inputgroup ">
+        <span class="ui-inputgroup-addon">min</span>
+        <input type="text" [(ngModel)]="criteria.sizeMin" pInputText placeholder="value">
+        <span class="ui-inputgroup-addon">max</span>
+        <input type="text" [(ngModel)]="criteria.sizeMax" pInputText placeholder="value">
+      </span>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end align-items-start">
+    <div class="d-flex flex-column justify-content-center align-items-start">
+      <button pButton (click)="getSearchResults()" label="Search"></button>
+      <a [routerLink]="" (click)="reset()" tabindex="-1"><small>Clear All Fields</small></a>
+    </div>
+    <div class="d-flex flex-column justify-content-center align-items-start pl-1">
+      <button pButton (click)="showSearchPanel()" label="Close Search"></button>
+    </div>
+  </div>
+</div>
+
+<p-table id="fund-list"
+         *ngIf="rows && rows.length > 0"
+         [value]="rows"
+         [columns]="cols"
+         [(editingRowKeys)]="editingRowKeys"
+         dataKey="id"
+         editMode="row"
+         [style]="{width: '100%'}"
+         (sortFunction)="customSort($event)"
+         [customSort]="true"
+         sortField="name"
+         sortOrder="1"
+         [scrollable]="true"
+         [resizableColumns]="true"
+         columnResizeMode="expand"
+         #table
+         >
+
+  <ng-template pTemplate="colgroup" let-columns>
+    <colgroup>
+      <col style="width: 2rem" />
+      <col *ngFor="let col of columns" [style.width]="col.width" />
+      <col style="width: 8rem" />
+      <col style="width: 8rem" />
+      <col style="width: 8rem" />
+      <col style="width: 8rem" />
+      <col style="width: 100%" />
+    </colgroup>
+  </ng-template>
+
+  <ng-template pTemplate="header" let-columns>
+    <tr data-cy="fund-grid-headers" (click)="trySaveEdits()">
+      <th></th>
+      <th *ngFor="let col of columns" [pSortableColumn]="col.field" class="crop" pResizableColumn>{{col.header}}<p-sortIcon [field]="col.field"></p-sortIcon></th>
+      <th [pSortableColumn]="'lastAccessedDate'" class="crop" pResizableColumn>Viewed<p-sortIcon [field]="'lastAccessedDate'"></p-sortIcon></th>
+      <th pResizableColumn>MSL</th>
+      <th pResizableColumn>MFN</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex" let-editing="editing" let-columns="columns">
+    <tr [pEditableRow]="rowData" data-cy="fund-rows">
+      <td>
+        <div>
+          <i *ngIf="rowData.isFavorite" class="fa fa-star link text-highlight-light" data-cy="fund-unfavorite-icon" title="Unfavorite" (click)="onRowUnfavorite(rowData)"></i>
+          <i *ngIf="!rowData.isFavorite" class="fa fa-star-o link text-highlight-light" data-cy="fund-favorite-icon" title="Favorite" (click)="onRowFavorite(rowData)"></i>
+        </div>
+      </td>
+
+      <td *ngFor="let col of columns" class="crop highlight-text" data-cy="row-cell">
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <input
+              pInputText
+              #fieldInput
+              [(ngModel)]="rowData[col.field]"
+              [attr.type]="col.type"
+              [attr.readonly]="col.readonly"
+              [ngClass]="{'w-100':true, 'text-align-right':col.field==='size'}"
+              (keyup)="inputOnKeyUp($event, rowData, rowIndex)">
+          </ng-template>
+
+          <ng-template pTemplate="output">
+            <div class="h-100 w-100" [ngSwitch]="col.field">
+              <a *ngSwitchCase="'name'" [routerLink]="['/funds',rowData.id]" class="text-cell" tabindex="-1">{{rowData.name}}</a>
+              <div *ngSwitchCase="'sponsorName'">
+                <a *ngIf="mode==='all'" [routerLink]="" class="text-cell" tabindex="-1" (click)="sponsorNameOnClick($event, rowData)">{{rowData.sponsorName}}</a>
+                <span *ngIf="mode!=='all'">{{rowData.sponsorName}}</span>
+              </div>
+              <div *ngSwitchCase="'businessUnitName'">
+                <a *ngIf="mode==='all'" [routerLink]="" class="text-cell" tabindex="-1" (click)="businessUnitNameOnClick($event, rowData)">{{rowData.businessUnitName}}</a>
+                <span *ngIf="mode!=='all'">{{rowData.businessUnitName}}</span>
+              </div>
+              <div *ngSwitchCase="'size'" class="text-align-right">{{rowData.size | currency:'$':'symbol':'1.0-0' }}</div>
+              <span *ngSwitchDefault>{{rowData[col.field]}}</span>
+            </div>
+          </ng-template>
+        </p-cellEditor>
+      </td>
+
+      <td class="crop" data-cy="last-accessed-date" (click)="trySaveEdits()">{{rowData.lastAccessedDate | date : 'shortDate'}} </td>
+
+      <td data-cy="fund-msl">
+        <div *ngIf="!editing">
+          <a class="fa fa-lg fa-times link p-1 text-black" data-cy="remove-msl" [ngClass]="{'invisible': !rowData.mslFileName}" (click)="removeMsl(rowData)" title="Remove MSL" tabindex="-1"></a>
+          <a class="fa fa-lg fa-upload link p-1 text-black" data-cy="upload-msl" (click)="onUploadMslClick(rowData)" title="Upload MSL" tabindex="-1"></a>
+          <a *ngIf="rowData.mslFileName" class="fa fa-lg fa-download link p-1 text-black" data-cy="download-msl"  href="/api/fund/downloadMsl/{{rowData.id}}" title="Download MSL" tabindex="-1"></a>
+          <a *ngIf="!rowData.mslFileName" class="fa fa-lg fa-download link p-1 disabled" title="Download MSL" tabindex="-1"></a>
+        </div>
+      </td>
+
+      <td data-cy="fund-mfn">
+        <div *ngIf="!editing">
+          <a class="fa fa-lg fa-times link p-1 text-black" data-cy="remove-mfn" [ngClass]="{'invisible': !rowData.mfnFileName}" (click)="removeMfn(rowData)" title="Remove MFN" tabindex="-1"></a>
+          <a class="fa fa-lg fa-upload link p-1 text-black" data-cy="upload-mfn" (click)="onUploadMfnClick(rowData)" title="Upload MFN" tabindex="-1"></a>
+          <a *ngIf="rowData.mfnFileName" class="fa fa-lg fa-download link p-1 text-black" data-cy="download-mfn"  href="/api/fund/downloadMfn/{{rowData.id}}" title="Download MFN" tabindex="-1"></a>
+          <a *ngIf="!rowData.mfnFileName" class="fa fa-lg fa-download link p-1 disabled"  title="Download MFN" tabindex="-1"></a>
+        </div>
+
+      </td>
+
+      <td data-cy="fund-actions">
+        <a *ngIf="!editing" [routerLink]="" (click)="onRowEditInit(rowData)" tabindex="-1"><i class="fa fa-lg fa-pencil link text-black mr-1" data-cy="fund-edit" title="Edit"></i></a>
+        <a *ngIf="!editing" [routerLink]="" (click)="onRowDelete(rowData)" tabindex="-1"><i class="fa fa-lg fa-trash link text-black" data-cy="fund-delete" title="Delete"></i></a>
+        <a *ngIf="editing" [routerLink]="" pSaveEditableRow (click)="onRowEditSave(rowData)"><i class="fa fa-lg fa-check link text-success mr-1" data-cy="fund-save" title="Save"></i></a>
+        <a *ngIf="editing" [routerLink]="" pCancelEditableRow (click)="onRowEditCancel(rowIndex)"><i class="fa fa-lg fa-times link text-danger" data-cy="fund-cancel" title="Cancel"></i></a>
+      </td>
+
+      <td (click)="trySaveEdits()"></td>
+    </tr>
+  </ng-template>
+</p-table>
+
+
+<div *ngIf="showViewMore" class="text-center m-1">
+  <a [routerLink]=""  (click)="getSearchResults(true)">View More</a>
+</div>
+
+
+<p-dialog [(visible)]="showConfirmDialog" [modal]="true" [responsive]="true"
+          [style]="{width: '300px', minWidth: '300px', backgroundColor:'white'}" [minY]="70" [baseZIndex]="10000"
+          [resizable]="false" [closable]="false" data-cy="fund-confirm-dialog">
+  <p>{{confirmDialogMessage}}</p>
+  <p-footer>
+    <button data-cy="delete-ok" pButton (click)="confirmDeleteClick(true)" label="OK"></button>
+    <button data-cy="delete-cancel" pButton (click)="confirmDeleteClick(false)" label="Cancel"></button>
+  </p-footer>
+</p-dialog>
+
+
+<input #mslUploader type="file" (change)="uploadMsl()" style="display: none;" accept=".doc,.docx" />
+<input #mfnUploader type="file" (change)="uploadMfn()" style="display: none;" accept=".doc,.docx" />

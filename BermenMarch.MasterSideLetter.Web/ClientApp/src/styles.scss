@@ -1,0 +1,402 @@
+@import "variables";
+@import "~bootstrap/scss/bootstrap.scss";
+@import "~font-awesome/css/font-awesome.css";
+@import "~primeng/resources/primeng.min.css";
+@import "~primeng/resources/themes/nova-light/theme.css";
+@import "~primeicons/primeicons.css";
+
+html {
+  height: 100%;
+  background: #fafbfc;
+}
+body {
+  margin: 0;
+  padding: 0;
+  height:100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #fafbfc;
+}
+
+.bg-page {
+  background: #fafbfc;
+}
+
+.text-black{
+  color:black !important;
+}
+
+
+.link {
+  cursor: pointer;
+}
+
+.crop {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+
+//returns the column color and backgroupnd color to nomal when a column is sorted, otherwise primeng turns it blue
+body .ui-table .ui-sortable-column.ui-state-highlight {
+  color: #333333 !important;
+  background-color: white !important;
+}
+//returns the column sort icon color back to gray when sorted, otherwise primeng turns it white
+body .ui-table .ui-sortable-column.ui-state-highlight .ui-sortable-column-icon {
+  color: #333333 !important;
+}
+
+
+
+//reduces the default padding of PrimeNg cells
+body .ui-table .ui-table-tbody > tr > td {
+  padding: 0.1em 0.2em;
+}
+//reduces the default padding of PrimeNg column headers
+body .ui-table .ui-table-thead > tr > th {
+  background: white;
+  padding: 0.2em 0.3em;
+}
+
+//removes the borders from PrimeNG headers
+body .ui-table .ui-table-thead > tr > th {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid silver;
+}
+//removes the borders from PrimeNG cells
+body .ui-table .ui-table-tbody > tr > td {
+  border: none;
+}
+
+//remove the background color and borders from PrimeNG menubar
+body .ui-menubar {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+body .ui-table .ui-table-tbody > tr:nth-child(odd) {
+  background-color: #f7f7f7;
+}
+
+body .ui-table .ui-table-tbody > tr:nth-child(even) {
+  background-color: inherit;
+}
+
+.pi-sort:before {
+  content: none;
+}
+
+.pi-sort-down:before {
+  content: "\e930";
+}
+
+.pi-sort-up:before {
+  content: "\e933";
+}
+
+.custom-menu {
+  li {
+    padding: 0 0.25rem;
+  }
+}
+
+a.disabled {
+  color: gray !important;
+  cursor: not-allowed;
+  text-decoration: underline;
+  pointer-events: none;
+}
+
+.text-highlight-light {
+  color: #9db6d4;
+}
+
+.text-highlight {
+  color: #5d7e95;
+}
+
+.text-highlight-dark {
+  color: #46587a;
+}
+
+
+.text-highlight-dark .ui-menuitem-text {
+  color: #46587a;
+}
+
+body .ui-menubar .text-highlight-dark .ui-menuitem-text {
+  color: #46587a;
+}
+
+body .ui-menubar .text-highlight-dark .ui-menuitem-text :hover {
+  color: #46587a;
+}
+
+
+body .ui-menubar .text-highlight-dark .ui-menuitem-icon {
+  color: #46587a;
+}
+
+body .ui-menubar .text-highlight-dark .ui-menuitem-icon :hover {
+  color: #46587a;
+}
+
+.text-cell {
+  color: #333333;
+}
+
+.custom-file-upload {
+  color: #333333 !important;
+  background: none !important;
+  border: none !important;
+
+  .pi-plus:before {
+    content: "\e934";
+  }
+
+  .ui-button-icon-left {
+    left: 25px !important;
+  }
+}
+
+.custom-upload {
+  background: none !important;
+  border: none !important;
+  font-size: 15px !important;
+  color: rgba(0, 0, 0, 0.1) !important;
+
+  .pi-plus {
+    border-style: dashed;
+  }
+
+  .pi-plus:before {
+    content: "\e934";
+  }
+
+  .ui-button-icon-left {
+    top: 0;
+    position: absolute;
+    height: 1em;
+    margin: -1px -8px;
+  }
+
+  .ui-button-text {
+    padding: 0em 0em 1em 1.75em !important;
+  }
+}
+
+.lh-1 {
+  line-height: 1;
+}
+
+.batch-upload-link {
+  .ui-button-text {
+    padding: 0.2em 0em 0em 0em !important;
+  }
+
+  .ui-button-icon-left {
+    display: none;
+  }
+}
+
+
+body .ui-inputgroup .ui-inputgroup-addon {
+  background-color: #f7f7f7;
+}
+
+del {
+  color: red;
+  text-decoration: line-through;
+}
+
+ins {
+  color: blue;
+  text-decoration:none;
+}
+
+
+td div.my-inplace {
+  border: 1px solid transparent;
+  min-height: 35px;
+  line-height:1.5;
+  display:inline-block;
+  padding:0.429em;
+}
+
+td div.my-inplace:hover {
+  border: 1px solid #a6a6a6;
+  border-radius:3px;
+}
+
+.my-inplace input {
+  border: 1px solid transparent;
+  background: transparent;
+}
+.my-inplace input:hover {
+  border: 1px solid #a6a6a6;
+}
+.my-inplace input:focus {
+  border: 1px solid #a6a6a6;
+}
+
+
+input.my-inplace {
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+input.my-inplace:hover {
+  border: 1px solid #a6a6a6;
+}
+
+input.my-inplace:focus {
+  border: 1px solid #a6a6a6;
+}
+
+.purple{
+  color:purple !important;
+}
+
+
+
+
+.input-line {
+  background: transparent;
+  border: none;
+  border-radius: 0px;
+  border-bottom: 1px solid #000000;
+  text-decoration: none !important;
+  outline: none;
+  box-shadow: none !important;
+}
+
+.input-line:focus {
+  background: transparent;
+  border: none;
+  border-radius: 0px;
+  border-bottom: 1px solid #000000;
+  text-decoration: none !important;
+
+}
+
+.input-line-button {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 5;
+}
+
+
+/*search multi select filters*/
+
+.search-multi-filter {
+  font-size: 11px !important;
+}
+
+.search-multi-filter .ui-autocomplete.ui-autocomplete-multiple .ui-autocomplete-multiple-container .ui-autocomplete-input-token input {
+  font-size: 10px !important;
+  width: 5rem;
+  overflow: visible;
+}
+
+body .search-multi-filter .ui-autocomplete-panel,
+body .search-multi-filter .ui-autocomplete-items,
+body .search-multi-filter .ui-autocomplete-input-token,
+body .search-multi-filter .ui-inputtext,
+body .search-multi-filter .ui-autocomplete-list-item,
+body .search-multi-filter .ui-widget{
+  font-size: 10px !important;
+}
+
+body .search-multi-filter .ui-autocomplete-panel .ui-autocomplete-items .ui-autocomplete-list-item {
+  font-size: 10px !important;
+}
+
+
+
+body .search-multi-filter .ui-autocomplete.ui-autocomplete-multiple .ui-autocomplete-multiple-container .ui-autocomplete-token {
+  font-size: 10px !important;
+  padding: 0.2145em 0.429em;
+  margin: 0 0.286em 0 0;
+  background: #007ad9;
+  color: #ffffff;
+}
+
+
+/*search range filters*/
+
+.search-range-filter {
+  font-size: 11px !important;
+}
+
+
+.search-range-filter .ui-inputtext,
+.search-range-filter .ui-autocomplete-list-item {
+  font-size: 10px !important;
+}
+
+.search-range-filter .ui-inputgroup input {
+  width: 3rem !important;
+}
+
+
+
+.opaque-text {
+  opacity: 0.4;
+}
+
+
+.highlightText {
+  background-color: yellow;
+}
+
+.table-row-cell{}
+
+.fund-details,
+.fund-details input {
+  font-size: small !important;
+ 
+}
+
+.pointer {
+  cursor: pointer !important;
+}
+
+
+.fund-details input {
+  color: #333333;
+  background: #ffffff;
+  border: 1px solid #a6a6a6;
+  transition: border-color 0.2s;
+  
+}
+
+
+/*hide spinner on number input */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.grid-search{
+  flex: .4 !Important;
+}
+
+.text-align-right {
+  text-align: right;
+}
+
+mark {
+  background-color: yellow;
+  padding: 0;
+}

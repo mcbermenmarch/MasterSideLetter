@@ -1,0 +1,169 @@
+<div class="d-flex flex-row align-items-center" (click)="trySaveEdits()">
+  <div *ngIf="showTitle" class="mr-auto mb-0 h5 text-highlight">{{pageTitle}}</div>
+  <div *ngIf="mode==='all'" class="ui-inputgroup lh-1">
+    <input  data-cy="investorpage-search" readonly type="text" pInputText placeholder="Search" (click)="showSearchPanel();">
+    <span class="ui-inputgroup-addon" data-cy="click-seacrh"><i class="fa fa-search" (click)="showSearchPanel();"></i></span>
+  </div>
+  <p-menubar *ngIf="showAddButton" data-cy="add-investor-button" [model]="menuBarItems" [autoDisplay]="false"></p-menubar>
+</div>
+<!--add standard -search-criteria-->
+<div *ngIf="showInvestorListSearch" class="flex-grow-0 mx-3">
+  <div>
+    <input id="searchInput" tabindex="0" type="text" pInputText class="w-100" (keyup.enter)="getSearchResults()" style="min-width:0 !important;" placeholder="Search" [(ngModel)]="criteria.targetText">
+  </div>
+  <div class="d-flex flex-wrap">
+    <div class="search-multi-filter p-1">
+      <p>Investor Name</p>
+      <p-autoComplete appendTo="body"
+                      [(ngModel)]="criteria.investorValues"
+                      [suggestions]="investorList"
+                      [multiple]="true"
+                      placeholder="investor"
+                      [forceSelection]="true"
+                      (completeMethod)="getFilterContents($event, 'Investor')"></p-autoComplete>
+    </div>
+
+    <div class="search-multi-filter p-1">
+      <p>Investor Type</p>
+      <p-autoComplete appendTo="body"
+                      [(ngModel)]="criteria.investorTypeValues"
+                      [suggestions]="investorTypeList"
+                      [multiple]="true"
+                      placeholder="Investor Type"
+                      (completeMethod)="getFilterContents($event, 'InvestorType')"
+                      [forceSelection]="true"
+                      (onKeyUp)="searchInvestorTypeOnKeyUp($event);"></p-autoComplete>
+    </div>
+    <div class="search-range-filter p-1">
+      <p >Aggregate Investor Size</p>
+      <span class="ui-inputgroup ">
+        <span class="ui-inputgroup-addon">min</span>
+        <input type="text" [(ngModel)]="criteria.aggregateSizeMin" pInputText placeholder="value">
+        <span class="ui-inputgroup-addon">max</span>
+        <input type="text" [(ngModel)]="criteria.aggregateSizeMax" pInputText placeholder="value">
+      </span>
+    </div>
+  </div>
+  <div class="d-flex justify-content-end align-items-start">
+    <div class="d-flex flex-column justify-content-center align-items-start">
+      <button pButton (click)="getSearchResults()" label="Search"></button>
+      <a [routerLink]="" (click)="reset()" tabindex="-1"><small>Clear All Fields</small></a>
+    </div>
+    <div class="d-flex flex-column justify-content-center align-items-start pl-1">
+      <button pButton (click)="showSearchPanel()" label="Close Search"></button>
+    </div>
+  </div>
+
+</div>
+<p-table id="investor-list"
+         *ngIf="rows && rows.length > 0"
+         [value]="rows"
+         [columns]="cols"
+         [(editingRowKeys)]="editingRowKeys"
+         dataKey="id"
+         editMode="row"
+         [style]="{width: '100%'}"
+         (sortFunction)="customSort($event)"
+         [customSort]="true"
+         sortField="name"
+         sortOrder="1"
+         [scrollable]="true"
+         [resizableColumns]="true"
+         columnResizeMode="expand"
+         #table
+         >
+
+  <ng-template pTemplate="colgroup" let-columns>
+    <colgroup>
+      <col style="width: 2rem" />
+      <col *ngFor="let col of columns" [style.width]="col.width" />
+      <col style="width: 30rem;"/>
+      <col style="width: 10rem" />
+      <col style="width: 10rem" />
+      <col style="width: 100%" />
+    </colgroup>
+  </ng-template>
+
+  <ng-template pTemplate="header" let-columns>
+    <tr data-cy="investor-grid-headers" (click)="trySaveEdits()">
+      <th></th>
+      <th *ngFor="let col of columns" [pSortableColumn]="col.field" class="crop" pResizableColumn>{{col.header}}<p-sortIcon [field]="col.field"></p-sortIcon></th>
+      <th class="crop" pResizableColumn>Recent Investments</th>
+      <th [pSortableColumn]="'lastAccessedDate'" class="crop" pResizableColumn>Viewed<p-sortIcon [field]="'lastAccessedDate'"></p-sortIcon></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex" let-editing="editing" let-columns="columns">
+    <tr [pEditableRow]="rowData" data-cy="investor-rows">
+      <td>
+        <div>
+          <i *ngIf="rowData.isFavorite" class="fa fa-star link text-highlight-light" data-cy="investor-unfavorite-icon" title="Unfavorite" (click)="onRowUnfavorite(rowData)"></i>
+          <i *ngIf="!rowData.isFavorite" class="fa fa-star-o link text-highlight-light" data-cy="investor-favorite-icon" title="Favorite" (click)="onRowFavorite(rowData)"></i>
+        </div>
+      </td>
+
+      <td *ngFor="let col of columns" class="crop highlight-text" data-cy="row-cell">
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <div *ngIf="!col.editable && col.field!=='aggregated'">{{rowData[col.field]}}</div>
+            <div *ngIf="!col.editable && col.field==='aggregated'" class="text-align-right">{{rowData.aggregated | currency:'$':'symbol':'1.0-0'}}</div>
+            <input *ngIf="col.editable"
+                   pInputText
+                   #fieldInput
+                   [(ngModel)]="rowData[col.field]"
+                   [attr.type]="col.type"
+                   [attr.readonly]="col.readonly"
+                   class="w-100"
+                   (keyup)="inputOnKeyUp($event, rowData, rowIndex)">
+          </ng-template>
+
+          <ng-template pTemplate="output">
+            <div class="h-100 w-100" [ngSwitch]="col.field">
+              <a *ngSwitchCase="'name'" [routerLink]="['/investors',rowData.id]" class="text-cell" tabindex="-1">{{rowData.name}}</a>
+              <div *ngSwitchCase="'aggregated'" class="text-align-right">{{rowData.aggregated | currency:'$':'symbol':'1.0-0' }}</div>
+              <span *ngSwitchDefault>{{rowData[col.field]}}</span>
+            </div>
+          </ng-template>
+        </p-cellEditor>
+      </td>
+
+      <td class="crop highlight-text" data-cy="recent-investments" (click)="trySaveEdits()">
+        
+        <a class="text-cell" *ngFor="let investment of rowData.recentInvestments;let first=first" [routerLink]="['/funds',investment.fundId]"><span *ngIf="!first">, </span>{{investment.fundName}}</a>
+      </td>
+
+
+      <td class="crop" data-cy="last-accessed-date" (click)="trySaveEdits()">{{rowData.lastAccessedDate | date : 'shortDate'}}</td>
+
+      <td>
+        <a *ngIf="!editing" [routerLink]="" (click)="onRowEditInit(rowData)" tabindex="-1"><i class="fa fa-lg fa-pencil link text-black mr-1" data-cy="investor-edit" title="Edit"></i></a>
+        <a *ngIf="!editing" [routerLink]="" (click)="onRowDelete(rowData)" tabindex="-1"><i class="fa fa-lg fa-trash link text-black" data-cy="investor-delete" title="Delete"></i></a>
+        <a *ngIf="editing" [routerLink]="" pSaveEditableRow (click)="onRowEditSave(rowData)"><i class="fa fa-lg fa-check link text-success mr-1" data-cy="investor-save" title="Save"></i></a>
+        <a *ngIf="editing" [routerLink]="" pCancelEditableRow (click)="onRowEditCancel(rowIndex)"><i class="fa fa-lg fa-times link text-danger" data-cy="investor-cancel" title="Cancel"></i></a>
+      </td>
+
+      <td (click)="trySaveEdits()"></td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<div *ngIf="showViewMore" class="text-center m-1">
+  <a [routerLink]=""  (click)="getSearchResults(true)">View More</a>
+</div>
+
+
+<p-dialog [(visible)]="showConfirmDialog" [modal]="true" [responsive]="true"
+          [style]="{width: '300px', minWidth: '300px', backgroundColor:'white'}" [minY]="70" [baseZIndex]="10000"
+          [resizable]="false" [closable]="false" data-cy="investor-confirm-dialog">
+  <p>{{confirmDialogMessage}}</p>
+  <p-footer>
+    <button data-cy="delete-ok" pButton (click)="confirmDeleteClick(true)" label="OK"></button>
+    <button data-cy="delete-cancel" pButton (click)="confirmDeleteClick(false)" label="Cancel"></button>
+  </p-footer>
+</p-dialog>
+
+
+<input #mslUploader type="file" (change)="uploadMsl()" style="display: none;" accept=".doc,.docx" />
+<input #mfnUploader type="file" (change)="uploadMfn()" style="display: none;" accept=".doc,.docx" />

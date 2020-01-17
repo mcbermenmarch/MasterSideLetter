@@ -1,0 +1,11 @@
+:host {
+  flex: 1;
+  display: flex;
+  //do not remove, required for app layout
+  min-height: 0px;
+}
+
+//remove submenu arrow from collasped menu
+:host ::ng-deep .collapsed-menu .ui-submenu-icon {
+  display: none;
+}

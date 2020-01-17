@@ -1,0 +1,56 @@
+<div class="d-flex flex-column p-3 overflow-auto">
+  <!--header-->
+
+  <div class="d-flex mb-3">
+    <!--Fund Details-->
+    <div class="flex-grow-1">
+      <h5>Settings</h5>
+      <table>
+        <tr>
+          <th>Function</th>
+          <th>Weight</th>
+          <th>Threshold</th>
+        </tr>
+        <tr>
+          <td class="font-weight-bold text-highlight">Algorithm 1</td>
+          <td class="px-1"><input class="text-align-right p-1" type="number" pInputText [(ngModel)]="settings.algorithm1Weight" (keyup)="settingsOnKeyUp($event)" /></td>
+          <td class="px-1"><input class="text-align-right p-1" type="number" pInputText [(ngModel)]="settings.algorithm1Threshold" (keyup)="settingsOnKeyUp($event)" /></td>
+        </tr>
+        <tr>
+          <td class="font-weight-bold text-highlight">Algorithm 2</td>
+          <td class="px-1"><input class="text-align-right p-1" type="number" pInputText [(ngModel)]="settings.algorithm2Weight" (keyup)="settingsOnKeyUp($event)" /></td>
+          <td class="px-1"><input class="text-align-right p-1" type="number" pInputText [(ngModel)]="settings.algorithm2Threshold" (keyup)="settingsOnKeyUp($event)" /></td>
+        </tr>
+        <tr>
+          <td class="font-weight-bold text-highlight">Algorithm 3</td>
+          <td class="px-1"><input class="text-align-right p-1" type="number" pInputText [(ngModel)]="settings.algorithm3Weight" (keyup)="settingsOnKeyUp($event)" /></td>
+          <td class="px-1"><input class="text-align-right p-1" type="number" pInputText [(ngModel)]="settings.algorithm3Threshold" (keyup)="settingsOnKeyUp($event)" /></td>
+        </tr>
+
+        <tr>
+          <td class="font-weight-bold text-highlight">Weighted</td>
+          <td></td>
+          <td class="px-1"><input class="text-align-right p-1" type="number" pInputText [(ngModel)]="settings.weightedThreshold" (keyup)="settingsOnKeyUp($event)" /></td>
+        </tr>
+        <tr>
+          <td class="font-weight-bold text-highlight">Inherit</td>
+          <td></td>
+          <td class="px-1"><input class="text-align-right p-1" type="number" pInputText [(ngModel)]="settings.inheritThreshold" (keyup)="settingsOnKeyUp($event)" /></td>
+        </tr>
+        <tr>
+          <td class="font-weight-bold text-highlight">MSL Grouping</td>
+          <td></td>
+          <td class="px-1"><input class="text-align-right p-1" type="number" pInputText [(ngModel)]="settings.mslGroupingThreshold" (keyup)="settingsOnKeyUp($event)" /></td>
+        </tr>
+        <tr>
+          <td colspan="3">
+            <div class="d-flex justify-content-end mt-2">
+              <p-button class="mr-1" label="Save" (onClick)="saveSettings()"></p-button>
+              <p-button label="Cancel" (onClick)="cancelEditSettings()"></p-button>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

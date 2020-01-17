@@ -1,0 +1,69 @@
+<div class="d-flex" *ngIf="provisions && provisions.length">
+  <!--Provision Type Filters-->
+  <div class="overflow-auto flex-shrink-0 p-3" style="width: 20rem;">
+    <div class="shadow-sm bg-white p-3 w-100" style="min-height: 100%;">
+      <h6>Provision Type</h6>
+      <div>
+        <ul class="list-unstyled">
+          <li *ngFor="let type of provisionTypes" class="pb-1 d-flex">
+            <p-checkbox class="flex-shrink-0" [(ngModel)]="selectedTypes" [value]="type.key"
+                        (ngModelChange)="onSelectedTypesChange()"></p-checkbox>
+            <div class="crop mr-auto">
+              &nbsp;{{type.key}}
+            </div>
+            <div class="text-warning flex-shrink-0">[ {{type.count}}]</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!--Provisions-->
+  <div class="flex-grow-1 overflow-auto p-3">
+
+    <div class="shadow-sm bg-white mb-3 p-3 d-flex" *ngFor="let provision of filteredProvisions">
+      <div class="flex-grow-1 mr-1 border-right d-flex flex-column">
+        <div class="flex-grow-1 mb-auto" [innerHTML]="provision.htmlContent"></div>
+        <div style="opacity:0.4">Score {{ provision.matchScore | percent : '0.1-1' }} </div>
+      </div>
+
+      <div class="flex-shrink-0 d-flex flex-column ml-2" style="width: 16rem;">
+        <a href="/api/fundInvestor/downloadSideLetter/{{ provision.fundInvestorId }}"
+           [attr.title]="provision.sideLetterFileName" class="crop">{{provision.sideLetterFileName }}</a>
+
+        <div class="d-flex align-items-center">
+          <div class="text-highlight font-weight-bold text-nowrap flex-shrink-0">Provision Type: </div>
+          <div class="flex-grow-1 d-flex">
+            <div class="flex-grow-1">
+              <p-autoComplete styleClass="my-inplace w-100" inputStyleClass="w-100 lh-1"
+                              appendTo="body"
+                              [(ngModel)]="provision.provisionType"
+                              [suggestions]="availableProvisionTypes"
+                              (completeMethod)="provisionTypeSearch($event)"
+                              (onKeyUp)="provisionTypeOnKeyUp($event,provision)"
+                              (onBlur)="provisionTypeOnBlur(provision)"
+                              (onFocus)="provisionTypeOnFocus(provision)"></p-autoComplete>
+            </div>
+            <i *ngIf="provision.onFocus" class="fa fa-check link text-success" (click)="updateProvisionType(provision)"></i>
+            <i *ngIf="provision.onFocus" class="fa fa-times link text-danger" (click)="cancelUpdateProvisionType(provision)"></i>
+
+          </div>
+
+
+        </div>
+
+        <div class="crop"><span class="text-highlight font-weight-bold">Fund: </span><span class="highlight-text"><a *ngIf="provision.fundId" [routerLink]="['/funds',provision.fundId]">{{ provision.fundName }}</a></span></div>
+        <div class="crop"><span class="text-highlight font-weight-bold">Investor: </span><span class="highlight-text"><a *ngIf="provision.investorId" [routerLink]="['/investors',provision.investorId]">{{ provision.investorName }}</a></span></div>
+        <div class="crop"><span class="text-highlight font-weight-bold">Sponsor: </span>{{ provision.fundSponsorName }}</div>
+        <div class="crop"><span class="text-highlight font-weight-bold">Commitment: </span>{{ provision.commitment }}</div>
+        <div class="crop"><span class="text-highlight font-weight-bold">Investor Type:</span>{{ provision.investorType }}</div>
+        <div class="crop"><span class="text-highlight font-weight-bold">Fund Year: </span>{{ provision.fundYear }}</div>
+      </div>
+
+    </div>
+    <!--bottom-->
+
+    <div class="shadow-sm bg-white p-3 h-100" *ngIf="!filteredProvisions.length">No results found.</div>
+
+  </div>
+</div>

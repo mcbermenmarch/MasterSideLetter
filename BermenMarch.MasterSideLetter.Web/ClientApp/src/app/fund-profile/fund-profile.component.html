@@ -1,0 +1,449 @@
+<div class="d-flex flex-column p-3 overflow-auto w-100" (click)="onClick($event)">
+<!--header-->
+
+<div class="d-flex mb-3">
+  <!--Fund Details-->
+  <div class="flex-grow-1">
+    <h5>Fund Profile</h5>
+    <table>
+      <colgroup>
+        <col style="width: 7rem;" />
+        <col style="width: 11.5rem;" />
+        <col style="width: 7rem;" />
+        <col style="width: 11.5rem;" />
+        <col style="width: 2rem;" />
+      </colgroup>
+      <tr style="height: 2.1rem;">
+        <td class="font-weight-bold text-highlight">Name:</td>
+
+        <td class="px-1 crop">
+          <input *ngIf="editingFundDetails" class="p-1" pInputText data-cy="fundprofile-details-name" [(ngModel)]="fundDetails.name" (keyup)="fundDetailsOnKeyUp($event)" />
+          <span *ngIf="!editingFundDetails">{{fundDetails.name}}</span>
+        </td>
+
+        <td class="font-weight-bold text-highlight">Sponsor:</td>
+        <td class="px-1 crop">
+          <input *ngIf="editingFundDetails" class="p-1" pInputText data-cy="fundprofile-details-sponsorName" [(ngModel)]="fundDetails.sponsorName" (keyup)="fundDetailsOnKeyUp($event)" />
+          <span *ngIf="!editingFundDetails">{{fundDetails.sponsorName}}</span>
+        </td>
+      </tr>
+      <tr style="height: 2.1rem;">
+        <td class="font-weight-bold text-highlight">Size:</td>
+        <td class="px-1 crop">
+          <input *ngIf="editingFundDetails" class="p-1" pInputText data-cy="fundprofile-details-size" [(ngModel)]="fundDetails.size" (keyup)="fundDetailsOnKeyUp($event)" />
+          <span *ngIf="!editingFundDetails">{{fundDetails.size | currency:'$':'symbol':'1.0-0'}}</span>
+        </td>
+        <td class="font-weight-bold text-highlight text-nowrap">Business Unit:</td>
+        <td class="px-1 crop">
+          <input *ngIf="editingFundDetails" class="p-1" pInputText data-cy="fundprofile-details-businessUnitName" [(ngModel)]="fundDetails.businessUnitName" (keyup)="fundDetailsOnKeyUp($event)" />
+          <span *ngIf="!editingFundDetails">{{fundDetails.businessUnitName}}</span>
+        </td>
+
+      </tr>
+      <tr style="height: 2.1rem;">
+        <td class="font-weight-bold text-highlight">Year:</td>
+        <td class="px-1 crop">
+          <input *ngIf="editingFundDetails" class="p-1" type="number" pInputText data-cy="fundprofile-details-year" [(ngModel)]="fundDetails.year" (keyup)="fundDetailsOnKeyUp($event)" />
+          <span *ngIf="!editingFundDetails">{{fundDetails.year}}</span>
+        </td>
+        <td class="font-weight-bold text-highlight">Strategy:</td>
+        <td class="px-1 crop">
+          <input *ngIf="editingFundDetails" class="p-1" pInputText data-cy="fundprofile-details-strategyName" [(ngModel)]="fundDetails.strategyName" (keyup)="fundDetailsOnKeyUp($event)" />
+          <span *ngIf="!editingFundDetails">{{fundDetails.strategyName}}</span>
+        </td>
+
+        <td class="d-flex">
+          <i *ngIf="!editingFundDetails" class="fa fa-lg fa-pencil link text-black" data-cy="fundprofile-investor-edit" title="Edit" (click)="editFundDetails()"></i>
+          <i *ngIf="editingFundDetails" class="fa fa-lg fa-check link text-success mr-1" data-cy="fundprofile-investor-save" title="Save" (click)="saveFundDetails()"></i>
+          <i *ngIf="editingFundDetails" class="fa fa-lg fa-times link text-danger" data-cy="fundprofile-investor-cancel" title="Cancel" (click)="cancelEditFundDetails()"></i>
+        </td>
+      </tr>
+    </table>
+
+  </div>
+
+  <!--Favorite Funds-->
+  <div class="w-25" data-cy="favfunds-list">
+    <h6>Favorite Funds</h6>
+    <div *ngFor="let fund of favFunds" data-cy="each-favfund">
+      <i class="fa fa-star link text-highlight-light" data-cy="fund-unfavorite-icon" title="Unfavorite" (click)="onFundUnfavorite(fund)"></i>
+      <a [routerLink]="['/funds',fund.id]" data-cy="favfund-name" class="text-cell"> {{fund.name}}</a>
+    </div>
+  </div>
+  <!--Recent Funds-->
+  <div class="w-25" data-cy="recentfunds-list">
+    <div class="mb-1">
+      <h6>Recently Viewed</h6>
+    </div>
+    <div *ngFor="let fund of recentlyViewedFund" data-cy="each-recentfund">
+      <i *ngIf="fund.isFavorite" class="fa fa-star link text-highlight-light" data-cy="fund-unfavorite-icon" title="Unfavorite" (click)="onFundUnfavorite(fund)"></i>
+      <i *ngIf="!fund.isFavorite" class="fa fa-star-o link text-highlight-light" data-cy="fund-favorite-icon" title="Favorite" (click)="onFundFavorite(fund)"></i>
+      <a [routerLink]="['/funds',fund.id]" data-cy="recentfund-name" class="text-cell"> {{fund.name}}</a>
+    </div>
+  </div>
+</div>
+
+
+<!--Investors Section-->
+<div class="flex-grow-1 d-flex flex-column p-2 shadow-sm bg-white rounded">
+
+<!--nav bar-->
+<div class="d-flex flex-row mb-2 align-items-center">
+  <p-menubar [model]="collapsedMenuBarItems" [autoDisplay]="false" class="d-xl-none"></p-menubar>
+  <div class="mr-auto"></div>
+  <div class="ui-inputgroup lh-1">
+    <input data-cy="fundprofile-search" readonly type="text" pInputText placeholder="Search" (click)="showSearchPanel();">
+    <span data-cy="fundprofile-search-button" class="ui-inputgroup-addon"><i class="fa fa-search" (click)="showSearchPanel();"></i></span>
+  </div>
+  <p-menubar data-cy="fundprofile-menubar" [model]="menuBarItems" [autoDisplay]="false" class="d-none d-xl-block"></p-menubar>
+</div>
+<!-- standard -search-criteria-->
+
+<div *ngIf="showSearch" class="flex-grow-0 mx-3">
+  <div class="p-3 d-flex">
+    <div class="d-flex flex-column mr-3">
+      <h5 class="text-nowrap">{{searchOption == 'standard' ? 'Standard' : 'Precedent'}} Search</h5>
+      <p-radioButton name="precedentSearchOptionButton" value="standard" label="Standard" [(ngModel)]="searchOption" (click)="getSearchResults()"></p-radioButton>
+      <p-radioButton name="precedentSearchOptionButton" value="precedent" label="Precedent" [(ngModel)]="searchOption" (click)="getSearchResults()"></p-radioButton>
+    </div>
+    <div class="flex-grow-1">
+      <div>
+        <input id="searchInput" type="text" pInputText class="w-100" (keyup.enter)="getSearchResults()" style="min-width:0 !important;" placeholder="Search" [(ngModel)]="criteria.targetText">
+      </div>
+      <div class="d-flex flex-wrap">
+
+
+
+        <div class="search-multi-filter p-1">
+            <p>Investor Name</p>
+            <p-autoComplete appendTo="body"
+                            [(ngModel)]="criteria.investorValues"
+                            [suggestions]="investorList"
+                            [multiple]="true"
+                            placeholder="investor"
+                            [forceSelection]="true"
+                            (completeMethod)="getFilterContents($event, 'Investor')"></p-autoComplete>
+          </div>
+
+
+
+
+
+
+        <div class="search-multi-filter p-1">
+            <p>Investor Type</p>
+            <p-autoComplete appendTo="body"
+                            [(ngModel)]="criteria.investorTypeValues"
+                            [suggestions]="investorTypeList"
+                            [multiple]="true"
+                            placeholder="Investor Type"
+                            [forceSelection]="true"
+                            (completeMethod)="getFilterContents($event, 'InvestorType')"></p-autoComplete>
+          </div>
+          <div class="search-multi-filter p-1">
+            <p>Investor Entity</p>
+            <p-autoComplete appendTo="body"
+                            [(ngModel)]="criteria.entityValues"
+                            [suggestions]="entityList"
+                            [multiple]="true"
+                            placeholder="Investor Entity"
+                            [forceSelection]="true"
+                            (completeMethod)="getFilterContents($event, 'Entity')"></p-autoComplete>
+          </div>
+          <div class="search-multi-filter p-1">
+            <p>Investor Counsel</p>
+            <p-autoComplete appendTo="body"
+                            [(ngModel)]="criteria.counselValues"
+                            [suggestions]="counselList"
+                            [multiple]="true"
+                            placeholder="Counsel"
+                            [forceSelection]="true"
+                            (completeMethod)="getFilterContents($event, 'Counsel')"></p-autoComplete>
+          </div>
+          <div class="search-multi-filter p-1">
+            <p>Provision Type</p>
+            <p-autoComplete appendTo="body"
+                            [(ngModel)]="criteria.provisionTypeValues"
+                            [suggestions]="provisionTypeList"
+                            [multiple]="true"
+                            placeholder="Provision Type"
+                            [forceSelection]="true"
+                            (completeMethod)="getFilterContents($event, 'ProvisionType')"></p-autoComplete>
+          </div>
+
+
+          <div class="search-range-filter p-1">
+            <p>Aggregate Investor Size</p>
+            <span class="ui-inputgroup ">
+              <span class="ui-inputgroup-addon">min</span>
+              <input type="text" [(ngModel)]="criteria.aggregateSizeMin" pInputText placeholder="value">
+              <span class="ui-inputgroup-addon">max</span>
+              <input type="text" [(ngModel)]="criteria.aggregateSizeMax" pInputText placeholder="value">
+            </span>
+          </div>
+          <div class="search-range-filter p-1">
+            <p>Investor Commitment</p>
+            <span class="ui-inputgroup ">
+              <span class="ui-inputgroup-addon">min</span>
+              <input type="text" [(ngModel)]="criteria.commitmentMin" pInputText placeholder="value">
+              <span class="ui-inputgroup-addon">max</span>
+              <input type="text" [(ngModel)]="criteria.commitmentMax" pInputText placeholder="value">
+            </span>
+          </div>
+
+        </div>
+      </div>
+  </div>
+
+  <div class="d-flex justify-content-end align-items-start">
+    <div class="d-flex flex-column justify-content-center align-items-start">
+      <button pButton (click)="getSearchResults()" label="Search"></button>
+      <a [routerLink]="" (click)="reset()" tabindex="-1"><small>Clear All Fields</small></a>
+    </div>
+    <div class="d-flex flex-column justify-content-center align-items-start pl-1">
+      <button pButton (click)="showSearchPanel()" label="Close Search"></button>
+    </div>
+  </div>
+      
+</div>
+
+<div *ngIf="searchOption==='standard'" class="flex-grow-1">
+<div class="pb-1">
+  <div class="mr-auto mb-0 h5 text-highlight">Investors</div>
+</div>
+<!--Grid-->
+<p-table [value]="rows"
+         id="fund-profile"
+         [columns]="cols"
+         [(editingRowKeys)]="editingRowKeys"
+         [dataKey]="dataKey"
+         editMode="row"
+         [style]="{width: '100%', height: 'auto'}"
+         (sortFunction)="customSort($event)"
+         [customSort]="true"
+         [sortField]="defaultSortField"
+         [sortOrder]="defaultSortOrder"
+         [scrollable]="!showSearch"
+         [scrollHeight]="'calc(100vh - 385px)'"
+         [resizableColumns]="true"
+         columnResizeMode="expand">
+
+  <ng-template pTemplate="colgroup" let-columns>
+    <colgroup>
+      <col style="width: 2rem">
+      <col style="width: 14rem">
+      <col style="width: 14rem">
+      <col *ngFor="let col of columns" [style.width]="col.width">
+      <col style="width: 10rem">
+      <col style="width: 4rem">
+      <col>
+    </colgroup>
+  </ng-template>
+
+
+
+  <ng-template pTemplate="header" let-columns>
+    <tr data-cy="fundprofile-investorgrid-header">
+      <th><input type="checkbox" [(ngModel)]="isAllSelected" (change)="selectAllFundInvestors($event)" /></th>
+      <th [pSortableColumn]="'investorName'" pResizableColumn class="crop">
+        Name <p-sortIcon [field]="'investorName'"></p-sortIcon>
+      </th>
+      <th [pSortableColumn]="'investorType'" pResizableColumn class="crop">
+        Type <p-sortIcon [field]="'investorType'"></p-sortIcon>
+      </th>
+      <th *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field" class="crop">
+        {{col.header}} <p-sortIcon [field]="col.field"></p-sortIcon>
+      </th>
+      <th [pSortableColumn]="'sideLetterFileName'" pResizableColumn class="crop">
+        Side Letter<p-sortIcon [field]="'sideLetterFileName'"></p-sortIcon>
+      </th>
+      <th pResizableColumn></th>
+      <th></th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex" let-editing="editing" let-columns="columns">
+    <tr style="height: 39px;" [pEditableRow]="rowData" data-cy="fundprofile-investor-row">
+
+      <td><input type="checkbox" tabindex="-1" data-cy="fundprofile-investor-checkbox" *ngIf="!editing" [(ngModel)]="rowData.isSelected" (change)="selectFundInvestor($event, rowData) " /></td>
+
+      <td class="crop highlight-text" data-cy="fundprofile-investor-name">
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <p-autoComplete [(ngModel)]="rowData.investor"
+                            styleClass="w-100"
+                            inputStyleClass="w-100"
+                            appendTo="body"
+                            [suggestions]="availableInvestors"
+                            field="name"
+                            (onBlur)="investorOnBlur(rowData)"
+                            (completeMethod)="investorSearch($event)"
+                            (onSelect)="investorOnSelect($event, rowData)"
+                            (onKeyUp)="investorOnKeyUp($event, rowData)">
+              <ng-template let-investor pTemplate="item">
+                <div class="d-flex">
+                  <div class="w-50">
+                    {{investor.name}}
+                  </div>
+                  <div class="w-50 crop">
+                    {{investor.investorType}}
+                  </div>
+                </div>
+              </ng-template>
+            </p-autoComplete>
+
+          </ng-template>
+          <ng-template pTemplate="output">
+            <div class="h-100 w-100">
+              <a *ngIf="rowData.investorId" class="text-cell" [routerLink]="['/investors',rowData.investorId]"> {{ rowData.investorName }} </a>
+            </div>
+          </ng-template>
+        </p-cellEditor>
+      </td>
+      <td class="crop highlight-text" data-cy="fundprofile-investor-investorType">
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <p-autoComplete [(ngModel)]="rowData.investorTypeInvestor"
+                            styleClass="w-100"
+                            inputStyleClass="w-100"
+                            appendTo="body"
+                            [suggestions]="availableInvestorTypeInvestors"
+                            field="investorType"
+                            (onBlur)="investorTypeOnBlur(rowData)"
+                            (completeMethod)="investorTypeSearch($event)"
+                            (onSelect)="investorTypeOnSelect($event, rowData)"
+                            (onKeyUp)="investorTypeOnKeyUp($event, rowData)">
+              <ng-template let-investor pTemplate="item">
+                <div class="d-flex">
+                  <div class="w-50">
+                    {{investor.name}}
+                  </div>
+                  <div class="w-50 crop">
+                    {{investor.investorType}}
+                  </div>
+                </div>
+
+              </ng-template>
+            </p-autoComplete>
+          </ng-template>
+          <ng-template pTemplate="output">
+            <div class="h-100 w-100">
+              {{ rowData.investorType }}
+            </div>
+          </ng-template>
+        </p-cellEditor>
+      </td>
+      <td *ngFor="let col of columns" class="crop highlight-text">
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <input pInputText
+                   [attr.type]="col.type"
+                   [(ngModel)]="rowData[col.field]"
+                   [attr.readonly]="col.readonly"
+                   [ngClass]="{'w-100':true, 'text-align-right':col.field==='commitment'}"
+                   (keyup)="inputOnKeyUp($event)">
+          </ng-template>
+          <ng-template pTemplate="output">
+            <div *ngIf="col.field==='commitment'" class="h-100 w-100 text-align-right">{{rowData.commitment | currency:'$':'symbol':'1.0-0' }}</div>
+            <div *ngIf="col.field!=='commitment'" class="h-100 w-100">{{rowData[col.field]}}</div>
+          </ng-template>
+        </p-cellEditor>
+      </td>
+
+      <td class="highlight-text">
+        <div class="d-flex align-items-center">
+          <div class="flex-grow-1 crop"><a tabindex="-1" href="/api/fundInvestor/downloadSideLetter/{{ rowData.id }}" [attr.title]="rowData.sideLetterFileName">{{rowData.sideLetterFileName }}</a></div>
+          <i class="fa fa-times link text-black" title="Remove Side Letter" [ngClass]="{'invisible': !rowData.sideLetterFileName}" (click)="onRemoveSideLetter(rowData)"></i>
+          <i class="fa fa-lg fa-upload link text-black" title="Upload Side Letter" (click)="onUploadSideLetterClick(rowData)"></i>
+        </div>
+      </td>
+
+      <td class="text-center">
+        <i *ngIf="!editing" class="fa fa-lg fa-tag link text-black mr-1" data-cy="fundprofile-investor-tags" title="Tag Provisions" (click)="onRowTagProvisions(rowData)"></i>
+        <i *ngIf="!editing" class="fa fa-lg fa-pencil link text-black" data-cy="fundprofile-investor-edit" title="Edit" (click)="onEditInit()"></i>
+        <i *ngIf="!editing" class="fa fa-lg fa-trash link text-black" data-cy="fundprofile-investor-delete" title="Delete" (click)="onRowDelete(rowData)"></i>
+        <i *ngIf="editing" class="fa fa-lg fa-check link text-success mr-1" data-cy="fundprofile-investor-save" title="Save" pSaveEditableRow (click)="onEditSave()"></i>
+        <i *ngIf="editing" class="fa fa-lg fa-times link text-danger" data-cy="fundprofile-investor-cancel" title="Cancel" pCancelEditableRow (click)="onEditCancel()"></i>
+      </td>
+      <td></td>
+    </tr>
+  </ng-template>
+</p-table>
+<div *ngIf="showViewMoreSideLetters" class="text-center m-1">
+  <a [routerLink]="" (click)="getMoreResults('SideLetter')">View More</a>
+</div>
+
+
+
+<!--provisions-->
+ 
+<div *ngIf="showSearch && provisions && provisions.length >0" class="py-2">
+  <div class="h5 text-highlight">Provisions</div>
+</div>
+<div class="flex-grow-1 overflow-auto p-3">
+  <div class="shadow-sm bg-white mb-3 p-3 d-flex" *ngFor="let provision of provisions">
+    <div class="flex-grow-1 pr-0 mr-1 border-right">
+      <p class="highlight-text" [innerHTML]="provision.content"></p>
+    </div>
+
+    <div class="flex-shrink-0 d-flex flex-column" style="width: 16rem;">
+      <a href="/api/fundInvestor/downloadSideLetter/{{ provision.fundInvestorId }}" [attr.title]="provision.sideLetterFileName" class="crop highlight-text">{{provision.sideLetterFileName }}</a>
+      <div class="d-flex align-items-center">
+        <div class="text-highlight font-weight-bold text-nowrap flex-shrink-0">Provision Type: </div>
+        <div class="flex-grow-1">
+          <p-autoComplete styleClass="my-inplace w-100" inputStyleClass="w-100 lh-1" class="highlight-text"
+                          appendTo="body"
+                          [(ngModel)]="provision.provisionType"
+                          [suggestions]="availableProvisionTypes"
+                          (completeMethod)="provisionTypeSearch($event)"
+                          (onKeyUp)="provisionTypeOnKeyUp($event, provision)"
+                          (onBlur)="provisionTypeOnBlur($event,provision)"></p-autoComplete>
+        </div>
+      </div>
+      <div class="crop"><span class="text-highlight font-weight-bold">Fund: </span><span class="highlight-text"><a *ngIf="provision.fundId" [routerLink]="['/funds',provision.fundId]">{{ provision.fundName }}</a></span></div>
+      <div class="crop"><span class="text-highlight font-weight-bold">Investor: </span><span class="highlight-text"><a *ngIf="provision.investorId" [routerLink]="['/investors',provision.investorId]">{{ provision.investorName }}</a></span></div>
+      <div class="crop"><span class="text-highlight font-weight-bold">Sponsor: </span><span class="highlight-text">{{ provision.fundSponsorName }}</span></div>
+      <div class="crop"><span class="text-highlight font-weight-bold">Commitment: </span><span class="highlight-text">{{ provision.commitment }}</span></div>
+      <div class="crop"><span class="text-highlight font-weight-bold">Investor Type: </span><span class="highlight-text">{{ provision.investorType }}</span></div>
+      <div class="crop"><span class="text-highlight font-weight-bold">Fund Year: </span><span class="highlight-text">{{ provision.fundYear }}</span></div>
+    </div>
+  </div>
+</div>
+<div *ngIf="showViewMoreProvisions" class="text-center">
+  <a [routerLink]="" (click)="getMoreResults('Provision')">View More</a>
+</div>
+</div>
+
+
+
+<div *ngIf="searchOption==='precedent'" class="flex-grow-1">
+  <div class="pb-1">
+    <div class="mr-auto mb-0 h5 text-highlight">Provisions</div>
+  </div>
+  <div *ngIf="provisions && provisions.length>0">
+    <app-precedent-search-results-component [provisions]="provisions"></app-precedent-search-results-component>
+  </div>
+  <div *ngIf="(!provisions || provisions.length===0)">No results found.</div>
+</div>
+
+</div>
+
+</div>
+
+<!--Dialog-->
+
+<p-dialog [(visible)]="showConfirmDialog" [modal]="true" [responsive]="true"
+          [style]="{width: '200px', minWidth: '200px', backgroundColor:'white'}" [minY]="70" [baseZIndex]="10000"
+          [resizable]="false" [closable]="false">
+  <p>{{confirmDialogMessage}}</p>
+  <p-footer>
+    <button data-cy="delete-ok" pButton (click)="onConfirmDeleteClick(true)" label="OK"></button>
+    <button data-cy="delete-cancel" pButton (click)="onConfirmDeleteClick(false)" label="Cancel"></button>
+  </p-footer>
+</p-dialog>
+
+<input #mslUploader type="file" (change)="uploadMsl()" style="display: none;" accept=".doc,.docx" />
+<input #mfnUploader type="file" (change)="uploadMfn()" style="display: none;" accept=".doc,.docx" />
+<input #batchUploader type="file" multiple="" (change)="uploadBatch()" style="display: none;" accept=".doc,.docx" />
+<input #sideLetterUploader type="file" multiple="" (change)="uploadSideLetter()" style="display: none;"
+       accept=".doc,.docx" />
